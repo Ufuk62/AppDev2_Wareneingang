@@ -12,7 +12,6 @@ public class Main {
             System.out.println(datenbank.getKunde("3"));
             System.out.println(datenbank.getLieferungen("3"));
             System.out.println(datenbank.getLieferschein("3"));
-            System.out.println(datenbank.getWareninfo("3"));
         } catch (SQLException e) {
             e.printStackTrace();
         }

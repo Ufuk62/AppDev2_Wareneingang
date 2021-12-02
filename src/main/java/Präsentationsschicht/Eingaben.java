@@ -3,9 +3,50 @@ package Präsentationsschicht;
 import Anwendungsschicht.Lieferschein;
 import Anwendungsschicht.Lieferung;
 
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.util.Scanner;
 
 public class Eingaben {
+
+
+    private void getInput() throws IOException {
+        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
+        System.out.println("Eine der folgenden Zahlen eingeben und Enter drücken: \n0 - Beenden\n1 - Lieferschein\n2 - Stueckzahl\n3 - Qualitaet\n4 - Annehmen\n5 - Ablehnen\n6 - Bezahlen\n");
+        String uInput = br.readLine();
+
+        switch (uInput) {
+            case "0":
+                System.out.println("Auf Wiedersehen!");
+                System.exit(0);
+                break;
+            case "1":
+                LieferscheinKorrekt();
+                break;
+            case "2":
+                StueckzahlKorrekt();
+                break;
+            case "3":
+                QualitaetPruefen();
+                break;
+            case "4":
+                Annehmen();
+                break;
+            case "5":
+                Ablehnen();
+                break;
+            case "6":
+                Bezahlen();
+                break;
+            default:
+                System.out.println("Bitte einen Wert von oben eingeben");
+                getInput();
+                break;
+        }
+    }
+
+
 
     void LieferscheinKorrekt() {
 
@@ -42,11 +83,11 @@ public class Eingaben {
             System.out.println("Die Qualitaet: " + lieferungObject.getQualitaet() + "wurde eingetragen!");
         }
 
-        void Annehmen ( int warennummer){
+        void Annehmen (){ //int warennummer
 
         }
 
-        void Ablehnen ( int warennummer){
+        void Ablehnen (){ //int warennummer
 
         }
 

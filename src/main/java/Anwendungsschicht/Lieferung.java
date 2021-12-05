@@ -1,31 +1,42 @@
 package Anwendungsschicht;
 
 public class Lieferung {
+private String lieferungsnummer; 
+private Kunde kunde ; 
+private Lieferschein lieferschein;
+private Hashtable<Ware,int> waren; //  enthält Stückzahl und Waren 
+private Hashtable<Ware,int>  abgelehnteWaren;
+private Hashtable<Ware,int> angenommneWaren;
+private boolean abgeschlossen ;
 
 
+public Lieferung ( String lieferungsnummer, Kunde kunde ,Lieferschein lieferschein)
+{
+this.lieferungsnummer = lieferungsnummer;
+this.kunde = kunde;
+this.lieferschein = lieferschein;
+}
 
-    public printLieferung();
+    public Lieferschein getLieferschein()
+{
+    return this.lieferschein;
+}
 
-    public getLieferschein(): Lieferschein;
-
-    public getWare(int warennummer);
-
-    public wareAnnehmen(int warennummer){
-
+    public Hashtable<Ware,int> getWaren(int warennummer){
+        return this.waren;
     }
-    public wareAblehnen(int warennummer){
 
+    public void wareAnnehmen(Ware ware, int stueckzahl){
+    angenommnenWaren.put(ware,stueckzahl)
+    }
+    public void wareAblehnen(Ware ware, int stueckzahl){
+        abgelehnteWaren.put(ware,stueckzahl)
     }
 
-    public printAngenommen(){
 
-    }
 
-    public printAbgelehnt(){
-
-    }
-
-    public abschliessen(bool bestaetigt) {
+    public abschliessen() {
+        this.abgeschlossen = true;
 
     }
 

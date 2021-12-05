@@ -9,7 +9,9 @@ import java.io.InputStreamReader;
 import java.util.Scanner;
 
 public class Eingaben {
-
+ // Als erstes Einagbe Kundennummer -> Ausgabe Liste der Lieferungen von dem Kunden.
+ // Danach Auswahl der Lieferung -> EPK Ablauf fortsetzen
+ // (1. Ist Ware in Lieferschein gleich mit Lieferung? -> Qualiaet/Stueckzahl prüfen. Wenn alles Ok. Bezahlen, sonst Teil oder alles Ablehnen)
 
     private void getInput() throws IOException {
         BufferedReader br = new BufferedReader(new InputStreamReader(System.in));

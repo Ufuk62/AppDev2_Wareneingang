@@ -21,7 +21,7 @@ public class Datenbank {
         }
     }
 
-    public Kunde getKunde(String kundennummer) throws SQLException {
+    public Kunde getKunde(int kundennummer) throws SQLException {
         String sql = "SELECT kundennummer FROM kunde WHERE kundennummer='" + kundennummer + "'";
 
         Statement stat = this.con.createStatement();
@@ -30,7 +30,7 @@ public class Datenbank {
         Kunde kunde = null;
 
         while (set.next()) {
-            kunde = new Kunde(set.getString("kundennummer"));
+            kunde = new Kunde(kundennummer, this.getLieferungen(kundennummer));
         }
 
         return kunde;
@@ -46,10 +46,7 @@ public class Datenbank {
 
         while (set.next()) {
             Hashtable data = new Hashtable();
-            Ware ware = new Ware(
-                    set.getString("warennummer"),
-                    set.getInt("stueckzahl")
-            );
+            Ware ware = new Ware();
 
             list.add(ware);
         }
@@ -57,8 +54,8 @@ public class Datenbank {
         return list;
     }
 
-    public List<Lieferung> getLieferungen(String kundennummer) throws SQLException {
-        List<Lieferung> list = new Vector();
+    public Hashtable<String, Lieferung> getLieferungen(int kundennummer) throws SQLException {
+        Hashtable<String, Lieferung> lieferungen = new Hashtable<String, Lieferung>();
 
         String sql = "SELECT lieferungsnummer, lieferscheinnummer FROM lieferung WHERE kundennummer='" + kundennummer + "'";
 
@@ -70,14 +67,13 @@ public class Datenbank {
 
             Lieferung lieferung = new Lieferung(
                     lieferungsnummer,
-                    set.getString("lieferscheinnummer"),
-                    kundennummer
+                    this.getLieferschein(set.getString("lieferscheinnummer"))
             );
 
-            list.add(lieferung);
+            lieferungen.put(lieferungsnummer, lieferung);
         }
 
-        return list;
+        return lieferungen;
     }
 
     private List<Ware> getLieferscheinWaren(String lieferscheinnummer) throws SQLException {
@@ -89,10 +85,7 @@ public class Datenbank {
         ResultSet set = stat.executeQuery(sql);
 
         while (set.next()) {
-            Ware ware = new Ware(
-                    set.getString("warennummer"),
-                    set.getInt("stueckzahl")
-            );
+            Ware ware = new Ware();
 
             list.add(ware);
         }
@@ -100,7 +93,18 @@ public class Datenbank {
         return list;
     }
 
-    public Lieferschein getLieferschein(String lieferscheinnummer) throws SQLException {
-        return new Lieferschein();
+    public Lieferschein getLieferschein(String lieferungsnummer) throws SQLException {
+        Lieferschein lieferschein = null;
+
+        String sql = "SELECT lieferscheinnummer FROM lieferschein WHERE lieferscheinnummer='" + lieferungsnummer + "';";
+
+        Statement statement = con.createStatement();
+        ResultSet resultSet = statement.executeQuery(sql);
+
+        while (resultSet.next()) {
+            lieferschein = new Lieferschein();
+        }
+
+        return lieferschein;
     }
 }

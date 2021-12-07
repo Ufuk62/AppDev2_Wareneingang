@@ -16,4 +16,8 @@ public class Kunde {
     public Lieferung getLieferung(int lieferungsnummer) {
         return (Lieferung) this.Lieferungen.get(lieferungsnummer);
     }
+
+    public int getKundennummer() {
+        return Kundennummer;
+    }
 }

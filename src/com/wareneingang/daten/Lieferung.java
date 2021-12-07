@@ -4,7 +4,6 @@ import java.util.Hashtable;
 
 public class Lieferung {
     private String lieferungsnummer;
-    private Kunde kunde ;
     private Lieferschein lieferschein;
     private Hashtable<Ware, Integer> waren; //  enthält Stückzahl und Waren
     private Hashtable<Ware, Integer>  abgelehnteWaren;
@@ -12,10 +11,9 @@ public class Lieferung {
     private boolean abgeschlossen ;
 
 
-    public Lieferung ( String lieferungsnummer, Kunde kunde ,Lieferschein lieferschein)
+    public Lieferung ( String lieferungsnummer, Lieferschein lieferschein)
     {
         this.lieferungsnummer = lieferungsnummer;
-        this.kunde = kunde;
         this.lieferschein = lieferschein;
     }
 

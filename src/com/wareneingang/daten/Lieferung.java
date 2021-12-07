@@ -8,14 +8,17 @@ public class Lieferung {
     private Hashtable<Ware, Integer> waren; //  enthält Stückzahl und Waren
     private Hashtable<Ware, Integer>  abgelehnteWaren;
     private Hashtable<Ware, Integer> angenommeneWaren;
-    private boolean abgeschlossen ;
-
+    private boolean abgeschlossen;
 
     public Lieferung ( String lieferungsnummer, Lieferschein lieferschein)
     {
         this.lieferungsnummer = lieferungsnummer;
         this.lieferschein = lieferschein;
     }
+
+    // Zweiter Konstruktor um Fehler in Eingabe.java zu entfernen
+    // An und fuer sich vermutlich aber nicht wirklich Sinnvoll
+    public Lieferung() {}
 
     public Lieferschein getLieferschein()
     {
@@ -36,4 +39,30 @@ public class Lieferung {
     public void abschliessen() {
         this.abgeschlossen = true;
     }
+
+    public String getLieferungsnummer() {
+        return lieferungsnummer;
+    }
+
+    public Hashtable<Ware, Integer> getAbgelehnteWaren() {
+        return abgelehnteWaren;
+    }
+
+    public Hashtable<Ware, Integer> getAngenommeneWaren() {
+        return angenommeneWaren;
+    }
+
+    public boolean isAbgeschlossen() {
+        return abgeschlossen;
+    }
+
+    // Um Fehler in Eingaben.java zu entfernen.
+    // Die Methoden gehoeren allerdings eher zu Ware.java.
+    public void setStueckzahl(int stueckzahl) {}
+
+    public int getStueckzahl() {return 0;}
+
+    public void setQualitaet(String qualitaet) {}
+
+    public String getQualitaet() {return "";}
 }

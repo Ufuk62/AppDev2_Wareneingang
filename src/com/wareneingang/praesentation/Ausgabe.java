@@ -1,19 +1,19 @@
 package com.wareneingang.praesentation;
 
 public class Ausgabe {
-    LieferungenAuflisten(int Kundennummer){
+    public void LieferungenAuflisten(int Kundennummer){
 
     }
 
-    LieferscheinAusgeben(){
+    public void LieferscheinAusgeben(){
 
     }
 
-    WareAusgeben(int liefernummer){
+    public void WareAusgeben(int liefernummer){
 
     }
 
-    UebersichtAusgeben(){
+    public void UebersichtAusgeben(){
 
     }
 }

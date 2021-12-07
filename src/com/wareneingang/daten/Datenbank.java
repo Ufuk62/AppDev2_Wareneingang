@@ -71,8 +71,7 @@ public class Datenbank {
             Lieferung lieferung = new Lieferung(
                     lieferungsnummer,
                     set.getString("lieferscheinnummer"),
-                    kundennummer,
-                    this.getLieferungsWaren(lieferungsnummer)
+                    kundennummer
             );
 
             list.add(lieferung);
@@ -102,6 +101,6 @@ public class Datenbank {
     }
 
     public Lieferschein getLieferschein(String lieferscheinnummer) throws SQLException {
-        return new Lieferschein(lieferscheinnummer, this.getLieferscheinWaren(lieferscheinnummer));
+        return new Lieferschein();
     }
 }

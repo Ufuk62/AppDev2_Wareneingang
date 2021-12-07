@@ -1,17 +1,41 @@
 package com.wareneingang.daten;
 
-import java.util.List;
+import java.util.Hashtable;
 
 public class Lieferung {
-    private String Lieferungsnummer;
-    private String Lieferscheinnummer;
-    private String Kundennummer;
-    private List<Ware> Waren;
+    private String lieferungsnummer;
+    private Kunde kunde ;
+    private Lieferschein lieferschein;
+    private Hashtable<Ware, Integer> waren; //  enthält Stückzahl und Waren
+    private Hashtable<Ware, Integer>  abgelehnteWaren;
+    private Hashtable<Ware, Integer> angenommeneWaren;
+    private boolean abgeschlossen ;
 
-    public Lieferung (String lieferungsnummer, String lieferscheinnummer, String kundennummer, List<Ware> waren) {
-        this.Lieferungsnummer = lieferungsnummer;
-        this.Lieferscheinnummer = lieferscheinnummer;
-        this.Kundennummer = kundennummer;
-        this.Waren = waren;
+
+    public Lieferung ( String lieferungsnummer, Kunde kunde ,Lieferschein lieferschein)
+    {
+        this.lieferungsnummer = lieferungsnummer;
+        this.kunde = kunde;
+        this.lieferschein = lieferschein;
+    }
+
+    public Lieferschein getLieferschein()
+    {
+        return this.lieferschein;
+    }
+
+    public Hashtable<Ware, Integer> getWaren(int warennummer){
+        return this.waren;
+    }
+
+    public void wareAnnehmen(Ware ware, int stueckzahl){
+        angenommeneWaren.put(ware,stueckzahl);
+    }
+    public void wareAblehnen(Ware ware, int stueckzahl){
+        abgelehnteWaren.put(ware,stueckzahl);
+    }
+
+    public void abschliessen() {
+        this.abgeschlossen = true;
     }
 }

@@ -1,11 +1,9 @@
 package com.wareneingang.daten;
 
 public class Ware {
-    private String Warennummer;
-    private int Anzahl;
+    int Warennummer;
+    String Warenbezeichnung;
+    double Warenwert;
 
-    public Ware(String warennummer, int anzahl) {
-        this.Warennummer = warennummer;
-        this.Anzahl = anzahl;
-    }
+    //Konstruktor fehlt
 }

@@ -1,11 +1,19 @@
 package com.wareneingang.daten;
 
-import java.util.List;
+import java.util.Hashtable;
 
 public class Kunde {
-    private String Kundennummer;
+    int Kundennummer;
+    // key = lieferungsnummer
+    // value = lieferung
+    Hashtable Lieferungen;
 
-    public Kunde (String kundennummer) {
+    public Kunde(int kundennummer, Hashtable lieferungen) {
         this.Kundennummer = kundennummer;
+        this.Lieferungen = lieferungen;
+    }
+
+    public Lieferung getLieferung(int lieferungsnummer) {
+        return (Lieferung) this.Lieferungen.get(lieferungsnummer);
     }
 }

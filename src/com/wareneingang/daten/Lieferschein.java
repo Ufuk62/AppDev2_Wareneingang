@@ -3,11 +3,19 @@ package com.wareneingang.daten;
 import java.util.List;
 
 public class Lieferschein {
-    private String Lieferscheinnummer;
-    private List<Ware> Waren;
+    int Lieferungsnummer = 10;
+    private int eingabeLieferscheinnummer;
 
-    public Lieferschein(String lieferscheinnummer, List<Ware> waren) {
-        this.Lieferscheinnummer = lieferscheinnummer;
-        this.Waren = waren;
+
+    public void setLieferscheinnummer(int lieferscheinnummer){
+        eingabeLieferscheinnummer = lieferscheinnummer;
+    }
+
+    public int getLieferscheinnummer(){
+        return eingabeLieferscheinnummer;
+    }
+
+    void printLieferschein(){
+
     }
 }

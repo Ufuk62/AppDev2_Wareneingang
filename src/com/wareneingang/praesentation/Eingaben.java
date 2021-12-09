@@ -2,9 +2,10 @@ package com.wareneingang.praesentation;
 
 import com.wareneingang.daten.*;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStreamReader;
+import java.rmi.RemoteException;
+import java.sql.SQLException;
+import java.time.LocalDateTime;
+import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Eingaben {
@@ -12,54 +13,146 @@ public class Eingaben {
     // Danach Auswahl der Lieferung -> EPK Ablauf fortsetzen
     // (1. Ist Ware in Lieferschein gleich mit Lieferung? -> Qualiaet/Stueckzahl prüfen. Wenn alles Ok. Bezahlen, sonst Teil oder alles Ablehnen)
 
-    private void getInput() throws IOException {
-        BufferedReader br = new BufferedReader(new InputStreamReader(System.in));
-        System.out.println("Eine der folgenden Zahlen eingeben und Enter drücken: \n0 - Beenden\n1 - Lieferschein\n2 - Stueckzahl\n3 - Qualitaet\n4 - Annehmen\n5 - Ablehnen\n6 - Bezahlen\n");
-        String uInput = br.readLine();
+    public static void wareneingang() throws RemoteException, SQLException {
+        Scanner scanner = new Scanner(System.in);
 
-        switch (uInput) {
-            case "0":
-                System.out.println("Auf Wiedersehen!");
-                System.exit(0);
-                break;
-            case "1":
-                LieferscheinKorrekt();
-                break;
-            case "2":
-                StueckzahlKorrekt();
-                break;
-            case "3":
-                QualitaetPruefen();
-                break;
-            case "4":
-                Annehmen();
-                break;
-            case "5":
-                Ablehnen();
-                break;
-            case "6":
-                Bezahlen();
-                break;
-            default:
-                System.out.println("Bitte einen Wert von oben eingeben");
-                getInput();
-                break;
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // liefernummer eingeben
+        //
+        int lieferNummer = 0;
+        Lieferung lieferung = null;
+
+        do {
+            try {
+                System.out.print("Bitte geben Sie die Liefernummer ein: ");
+                lieferNummer = scanner.nextInt();
+                lieferung = lieferung.getLieferung(lieferNummer);
+
+            } catch (LieferungNotFoundException e) {
+                System.out.printf("Es konnte keine Lieferung mit der Nummer" + lieferNummer + "gefunden werden.\n");
+            } catch (InputMismatchException e) {
+                System.out.println("Ungültige Eingabe!");
+                scanner.next();
+            }
+        } while (lieferung == null);
+
+        System.out.println("\n" + String.format("Lieferung " + lieferNummer + " des Lieferscheins" + lieferscheinnummer +"(Lieferdatum:" + LocalDateTime. now()));
+
+        if (lieferung.getAngenommen() != Lieferung.AngenommenEnum.NEIN) {
+            System.err.println("Die Lieferung wurde bereits bearbeitet und Angenommen");
+            return;
         }
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Lieferung beauftragt?
+        //
+        boolean weiter = false;
+        do {
+            weiter = false;
+            try {
+                System.out.println("\nWurden die Waren durch Sie bestellt? (ja|nein) ");
+                String input = scanner.next();
+
+                if(input.equalsIgnoreCase("ja"))
+                    weiter = true;
+                else if(input.equalsIgnoreCase("nein")) {
+
+                    // Annahme der Lieferung verweigern und Vorgang abbrechen
+                    lieferung.setLieferungAngenommen(lieferung.getLiefernummer(), Lieferung.AngenommenEnum.VERWEIGERT);
+                    System.out.println("Der Status der Lieferung wurde auf \"Annahme verweigert\" gesetzt");
+                    return;
+
+                } else
+                    System.out.println("Ungültige Eingabe! Geben Sie \"ja\" oder \"nein\" ein.");
+
+            } catch (InputMismatchException e) {
+                System.out.println("Ungültige Eingabe!");
+                scanner.next();
+            }
+        } while(weiter != true);
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Lieferung ausgeben
+        //
+        System.out.print("\n\n\n");
+        System.out.println(lieferung);
+        System.out.print("\n\n");
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Mangel vorhanden?
+        //
+        System.out.println("Bitte prüfen Sie die Lieferung nach ihrer Qualität und Stückzahl!");
+        do {
+            weiter = false;
+            try {
+                System.out.println("\nIst ein Mangel in der Lieferung vorhanden? (ja|nein) ");
+                String input = scanner.next();
+
+                if(input.equalsIgnoreCase("ja"))
+                    weiter = true;
+                else if(input.equalsIgnoreCase("nein")) {
+
+                    // Lieferung annehmen und Programm beenden
+                    lieferung.setLieferungAngenommen(lieferung.getLiefernummer(), Lieferung.AngenommenEnum.JA);
+                    System.out.println("Der Status der Lieferung wurde auf \"Angenommen\" gesetzt");
+                    return;
+
+                } else
+                    System.out.println("Ungültige Eingabe! Geben Sie \"ja\" oder \"nein\" ein.");
+
+            } catch (InputMismatchException e) {
+                System.out.println("Ungültige Eingabe!");
+                scanner.next();
+            }
+        } while(weiter != true);
+
+        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+        // Teilannahme
+        //
+        do {
+            weiter = false;
+            try {
+                System.out.println("\nWollen Sie einen Teil der Lieferung annehmen? (ja|nein) ");
+                String input = scanner.next();
+
+                if(input.equalsIgnoreCase("ja")) {
+
+                    // Lieferung zum Teil annehmen
+                    lieferung.setLieferungAngenommen(lieferung.getLiefernummer(), Lieferung.AngenommenEnum.TEILWEISE);
+                    System.out.println("Der Status der Lieferung wurde auf \"Teilweise angenommen\" gesetzt");
+                    weiter = true;
+
+                } else if(input.equalsIgnoreCase("nein")) {
+
+                    // Lieferung ablehnen
+                    lieferung.setLieferungAngenommen(lieferung.getLiefernummer(), Lieferung.AngenommenEnum.VERWEIGERT);
+                    System.out.println("Der Status der Lieferung wurde auf \"Annahme verweigert\" gesetzt");
+                    weiter = true;
+
+                } else
+                    System.out.println("Ungültige Eingabe! Geben Sie \"ja\" oder \"nein\" ein.");
+
+            } catch (InputMismatchException e) {
+                System.out.println("Ungültige Eingabe!");
+                scanner.next();
+            }
+        } while(weiter != true);
+
     }
 
 
-
+    //// ALT!
     void LieferscheinKorrekt() {
 
-        Scanner lieferscheinscanner = new Scanner(System.in); //System.in, da der String von der Konsole eingelesen werden soll
-        Lieferschein lieferscheinObject = new Lieferschein();
-        System.out.println("Tragen Sie die Lieferscheinnummer ein!");
-        int lieferscheinnummer = lieferscheinscanner.nextInt();
+        Scanner lieferungscanner = new Scanner(System.in); //System.in, da der String von der Konsole eingelesen werden soll
+        Lieferung lieferungObject = new Lieferung();
+        System.out.println("Tragen Sie die Lieferungsnummer ein, die sie benötigen!");
+        int lieferungsnummer = lieferungscanner.nextInt();
 
         //Datenbankabfrage fehlt
-        if ((lieferscheinnummer < 25) && (lieferscheinnummer != 0)) {
-            lieferscheinObject.setLieferscheinnummer(lieferscheinnummer);
-            System.out.println("Die Lieferung mit der Nummer:" + lieferscheinObject.getLieferscheinnummer() + "wurde gefunden!");
+        if ((lieferungsnummer < 25) && (lieferungsnummer != 0)) {
+            lieferungObject.setLieferung(lieferungsnummer);
+            System.out.println("Die Lieferung mit der Nummer:" + lieferungObject.getLieferung() + "wurde gefunden!");
+            Kunde.getLieferung(lieferungsnummer);
         }
     }
 

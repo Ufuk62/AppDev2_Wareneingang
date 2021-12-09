@@ -17,7 +17,11 @@ public class Kunde {
         return (Lieferung) this.Lieferungen.get(lieferungsnummer);
     }
 
-    public int getKundennummer() {
+    public void setKundennummer(int Kundennummer){
+        int eingabeKundennummer = Kundennummer;
+    }
+
+    public int getKundennummer(){
         return Kundennummer;
     }
 }

@@ -3,25 +3,33 @@ package com.wareneingang.daten;
 import java.util.Hashtable;
 
 public class Kunde {
-    int Kundennummer;
+    private int kundennummer;
+    private String vorname;
+    private String nachname;
     // key = lieferungsnummer
     // value = lieferung
-    Hashtable<Integer, Lieferung> Lieferungen;
+    private Hashtable<Integer, Lieferung> lieferungen;
 
-    public Kunde(int kundennummer, Hashtable<Integer, Lieferung> lieferungen) {
-        this.Kundennummer = kundennummer;
-        this.Lieferungen = lieferungen;
+    public Kunde(int kundennummer, String vorname, String nachname, Hashtable<Integer, Lieferung> lieferungen) {
+        this.kundennummer = kundennummer;
+        this.lieferungen = lieferungen;
+        this.vorname = vorname;
+        this.nachname = nachname;
     }
 
     public Lieferung getLieferung(int lieferungsnummer) {
-        return this.Lieferungen.get(lieferungsnummer);
+        return this.lieferungen.get(lieferungsnummer);
     }
 
     public int getKundennummer() {
-        return Kundennummer;
+        return this.kundennummer;
     }
 
     public Hashtable<Integer, Lieferung> getLieferungen() {
-        return Lieferungen;
+        return this.lieferungen;
+    }
+
+    public String getName() {
+        return this.nachname + ", " + this.vorname;
     }
 }

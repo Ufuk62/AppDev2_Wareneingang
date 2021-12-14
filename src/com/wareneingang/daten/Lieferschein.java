@@ -4,22 +4,18 @@ import java.util.Hashtable;
 import java.util.List;
 
 public class Lieferschein {
-    int Lieferungsnummer = 10;
+    int lieferungsnummer;
     private int eingabeLieferscheinnummer;
 
-    public Lieferschein (Hashtable<Ware, Integer> waren) {
-
+    public Lieferschein (int lieferungsnummer) {
+        this.lieferungsnummer = lieferungsnummer;
     }
 
     public void setLieferscheinnummer(int lieferscheinnummer){
         eingabeLieferscheinnummer = lieferscheinnummer;
     }
 
-    public int getLieferscheinnummer(){
+    public int getLieferscheinnummer() {
         return eingabeLieferscheinnummer;
-    }
-
-    void printLieferschein(){
-
     }
 }

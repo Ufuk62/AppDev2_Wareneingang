@@ -1,9 +1,15 @@
 package com.wareneingang.daten;
 
 public class Ware {
-    int Warennummer;
+    int warennummer;
     String Warenbezeichnung;
     double Warenwert;
 
-    //Konstruktor fehlt
+    public Ware (int warennummer) {
+        this.warennummer = warennummer;
+    }
+
+    public int getWarennummer() {
+        return warennummer;
+    }
 }

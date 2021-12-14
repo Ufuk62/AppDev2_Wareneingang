@@ -5,6 +5,7 @@ import com.wareneingang.daten.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.util.Hashtable;
 import java.util.Scanner;
 
 public class Eingaben {
@@ -52,7 +53,7 @@ public class Eingaben {
     void LieferscheinKorrekt() {
 
         Scanner lieferscheinscanner = new Scanner(System.in); //System.in, da der String von der Konsole eingelesen werden soll
-        Lieferschein lieferscheinObject = new Lieferschein();
+        Lieferschein lieferscheinObject = new Lieferschein(new Hashtable<>());
         System.out.println("Tragen Sie die Lieferscheinnummer ein!");
         int lieferscheinnummer = lieferscheinscanner.nextInt();
 

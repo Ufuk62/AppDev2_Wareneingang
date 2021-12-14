@@ -3,17 +3,18 @@ package com.wareneingang.daten;
 import java.util.Hashtable;
 
 public class Lieferung {
-    private String lieferungsnummer;
+    private int lieferungsnummer;
     private Lieferschein lieferschein;
     private Hashtable<Ware, Integer> waren; //  enthält Stückzahl und Waren
-    private Hashtable<Ware, Integer>  abgelehnteWaren;
-    private Hashtable<Ware, Integer> angenommeneWaren;
+    public Hashtable<Ware, Integer> abgelehnteWaren = new Hashtable<>();
+    public Hashtable<Ware, Integer> angenommeneWaren = new Hashtable<>();
     private boolean abgeschlossen;
 
-    public Lieferung ( String lieferungsnummer, Lieferschein lieferschein)
+    public Lieferung (int lieferungsnummer, Lieferschein lieferschein, Hashtable<Ware, Integer> waren)
     {
         this.lieferungsnummer = lieferungsnummer;
         this.lieferschein = lieferschein;
+        this.waren = waren;
     }
 
     // Zweiter Konstruktor um Fehler in Eingabe.java zu entfernen
@@ -25,7 +26,7 @@ public class Lieferung {
         return this.lieferschein;
     }
 
-    public Hashtable<Ware, Integer> getWaren(int warennummer){
+    public Hashtable<Ware, Integer> getWaren(){
         return this.waren;
     }
 
@@ -40,7 +41,7 @@ public class Lieferung {
         this.abgeschlossen = true;
     }
 
-    public String getLieferungsnummer() {
+    public int getLieferungsnummer() {
         return lieferungsnummer;
     }
 

@@ -6,18 +6,22 @@ public class Kunde {
     int Kundennummer;
     // key = lieferungsnummer
     // value = lieferung
-    Hashtable Lieferungen;
+    Hashtable<Integer, Lieferung> Lieferungen;
 
-    public Kunde(int kundennummer, Hashtable lieferungen) {
+    public Kunde(int kundennummer, Hashtable<Integer, Lieferung> lieferungen) {
         this.Kundennummer = kundennummer;
         this.Lieferungen = lieferungen;
     }
 
     public Lieferung getLieferung(int lieferungsnummer) {
-        return (Lieferung) this.Lieferungen.get(lieferungsnummer);
+        return this.Lieferungen.get(lieferungsnummer);
     }
 
     public int getKundennummer() {
         return Kundennummer;
+    }
+
+    public Hashtable<Integer, Lieferung> getLieferungen() {
+        return Lieferungen;
     }
 }

@@ -4,10 +4,10 @@ import java.sql.*;
 import java.util.*;
 
 public class Datenbank {
-    private static String _Url = "jdbc:mariadb://localhost/appdev";
-    private static String _Driver = "org.mariadb.jdbc.Driver";
-    private static String _User = "root";
-    private static String _Password = "";
+    private static final String _Url = "jdbc:mariadb://localhost/appdev";
+    private static final String _Driver = "org.mariadb.jdbc.Driver";
+    private static final String _User = "root";
+    private static final String _Password = "";
     private Connection con = null;
 
     public Datenbank() throws SQLException {
@@ -15,8 +15,6 @@ public class Datenbank {
             Class.forName(_Driver);
             this.con = DriverManager.getConnection(_Url, _User, _Password);
         } catch (ClassNotFoundException e) {
-            e.printStackTrace();
-        } catch (SQLException e) {
             e.printStackTrace();
         }
     }
@@ -36,8 +34,8 @@ public class Datenbank {
         return kunde;
     }
 
-    private List<Ware> getLieferungsWaren(String lieferungsnummer) throws SQLException {
-        List<Ware> list = new Vector();
+    private Hashtable<Ware, Integer> getLieferungsWaren(int lieferungsnummer) throws SQLException {
+        Hashtable<Ware, Integer> waren = new Hashtable<>();
 
         String sql = "SELECT warennummer, stueckzahl FROM enthaelt WHERE lieferungsnummer='" + lieferungsnummer + "'";
 
@@ -45,17 +43,16 @@ public class Datenbank {
         ResultSet set = stat.executeQuery(sql);
 
         while (set.next()) {
-            Hashtable data = new Hashtable();
-            Ware ware = new Ware();
+            Ware ware = new Ware( Integer.parseInt(set.getString("warennummer")) );
 
-            list.add(ware);
+            waren.put(ware, set.getInt("stueckzahl"));
         }
 
-        return list;
+        return waren;
     }
 
-    public Hashtable<String, Lieferung> getLieferungen(int kundennummer) throws SQLException {
-        Hashtable<String, Lieferung> lieferungen = new Hashtable<String, Lieferung>();
+    private Hashtable<Integer, Lieferung> getLieferungen(int kundennummer) throws SQLException {
+        Hashtable<Integer, Lieferung> lieferungen = new Hashtable<>();
 
         String sql = "SELECT lieferungsnummer, lieferscheinnummer FROM lieferung WHERE kundennummer='" + kundennummer + "'";
 
@@ -63,11 +60,12 @@ public class Datenbank {
         ResultSet set = stat.executeQuery(sql);
 
         while (set.next()) {
-            String lieferungsnummer = set.getString("lieferungsnummer");
+            int lieferungsnummer = set.getInt("lieferungsnummer");
 
             Lieferung lieferung = new Lieferung(
                     lieferungsnummer,
-                    this.getLieferschein(set.getString("lieferscheinnummer"))
+                    this.getLieferschein(set.getString("lieferscheinnummer")),
+                    this.getLieferungsWaren(lieferungsnummer)
             );
 
             lieferungen.put(lieferungsnummer, lieferung);
@@ -76,8 +74,8 @@ public class Datenbank {
         return lieferungen;
     }
 
-    private List<Ware> getLieferscheinWaren(String lieferscheinnummer) throws SQLException {
-        List<Ware> list = new Vector();
+    private Hashtable<Ware, Integer> getLieferscheinWaren(String lieferscheinnummer) throws SQLException {
+        Hashtable<Ware, Integer> waren = new Hashtable<>();
 
         String sql = "SELECT warennummer, stueckzahl FROM fuehrt_auf WHERE lieferscheinnummer='" + lieferscheinnummer + "'";
 
@@ -85,15 +83,15 @@ public class Datenbank {
         ResultSet set = stat.executeQuery(sql);
 
         while (set.next()) {
-            Ware ware = new Ware();
+            Ware ware = new Ware( Integer.parseInt(set.getString("warennummer")) );
 
-            list.add(ware);
+            waren.put(ware, set.getInt("stueckzahl"));
         }
 
-        return list;
+        return waren;
     }
 
-    public Lieferschein getLieferschein(String lieferungsnummer) throws SQLException {
+    private Lieferschein getLieferschein(String lieferungsnummer) throws SQLException {
         Lieferschein lieferschein = null;
 
         String sql = "SELECT lieferscheinnummer FROM lieferschein WHERE lieferscheinnummer='" + lieferungsnummer + "';";
@@ -102,9 +100,40 @@ public class Datenbank {
         ResultSet resultSet = statement.executeQuery(sql);
 
         while (resultSet.next()) {
-            lieferschein = new Lieferschein();
+            lieferschein = new Lieferschein(this.getLieferscheinWaren(
+                    resultSet.getString("lieferscheinnummer")
+            ));
         }
 
         return lieferschein;
+    }
+
+    public boolean save(Kunde kunde) {
+        Collection<Lieferung> lieferungen = kunde.getLieferungen().values();
+        Iterator<Lieferung> lieferungenIterator = lieferungen.iterator();
+
+        while (lieferungenIterator.hasNext()) {
+            Lieferung lieferung = lieferungenIterator.next();
+            System.out.println("Lieferung:\t" + lieferung.getLieferungsnummer());
+
+            Set<Ware> angenommene = lieferung.getAngenommeneWaren().keySet();
+            Iterator<Ware> angenommeneIterator = angenommene.iterator();
+
+            while (angenommeneIterator.hasNext()) {
+                Ware ware = angenommeneIterator.next();
+                System.out.println("\tAngenommen: " + lieferung.getAngenommeneWaren().get(ware) + "x " + ware.getWarennummer());
+            }
+
+            Set<Ware> abgelehnte = lieferung.getAbgelehnteWaren().keySet();
+            Iterator<Ware> abgelehnteIterator = abgelehnte.iterator();
+
+            while (abgelehnteIterator.hasNext()) {
+                Ware ware = abgelehnteIterator.next();
+                System.out.println("\tAbgelehnt: " + lieferung.getAbgelehnteWaren().get(ware) + "x " + ware.getWarennummer());
+            }
+
+        }
+
+        return false;
     }
 }

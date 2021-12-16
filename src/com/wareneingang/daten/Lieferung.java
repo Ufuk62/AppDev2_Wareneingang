@@ -1,19 +1,24 @@
 package com.wareneingang.daten;
 
+import java.util.Date;
 import java.util.Hashtable;
 
 public class Lieferung {
-    private String lieferungsnummer;
+    private int lieferungsnummer;
+    private Date eingangsdatum;
     private Lieferschein lieferschein;
     private Hashtable<Ware, Integer> waren; //  enthält Stückzahl und Waren
-    private Hashtable<Ware, Integer>  abgelehnteWaren;
-    private Hashtable<Ware, Integer> angenommeneWaren;
+    private Hashtable<Ware, Integer> abgelehnteWaren = new Hashtable<>();
+    private Hashtable<Ware, Integer> angenommeneWaren = new Hashtable<>();
     private boolean abgeschlossen;
 
-    public Lieferung ( String lieferungsnummer, Lieferschein lieferschein)
+    public Lieferung (int lieferungsnummer, Date eingangsdatum, Lieferschein lieferschein, Hashtable<Ware, Integer> waren, boolean abgeschlossen)
     {
         this.lieferungsnummer = lieferungsnummer;
+        this.eingangsdatum = eingangsdatum;
         this.lieferschein = lieferschein;
+        this.waren = waren;
+        this.abgeschlossen = abgeschlossen;
     }
 
     // Zweiter Konstruktor um Fehler in Eingabe.java zu entfernen
@@ -25,7 +30,7 @@ public class Lieferung {
         return this.lieferschein;
     }
 
-    public Hashtable<Ware, Integer> getWaren(int warennummer){
+    public Hashtable<Ware, Integer> getWaren(){
         return this.waren;
     }
 
@@ -40,7 +45,7 @@ public class Lieferung {
         this.abgeschlossen = true;
     }
 
-    public String getLieferungsnummer() {
+    public int getLieferungsnummer() {
         return lieferungsnummer;
     }
 
@@ -65,4 +70,16 @@ public class Lieferung {
     public void setQualitaet(String qualitaet) {}
 
     public String getQualitaet() {return "";}
+
+    public Date getEingangsdatum() {
+        return eingangsdatum;
+    }
+
+    public void addAngenommeneWare(Ware ware, int stueckzahl) {
+        angenommeneWaren.put(ware, stueckzahl);
+    }
+
+    public void addAbgelehnteWare(Ware ware, int stueckzahl) {
+        abgelehnteWaren.put(ware, stueckzahl);
+    }
 }

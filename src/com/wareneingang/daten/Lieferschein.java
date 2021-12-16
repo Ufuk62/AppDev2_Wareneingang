@@ -1,19 +1,20 @@
 package com.wareneingang.daten;
 
+import java.util.Date;
+import java.util.Hashtable;
+
 public class Lieferschein {
-    int Lieferungsnummer = 10;
-    private int eingabeLieferscheinnummer;
+    private int lieferscheinnummer;
+    private Hashtable<Ware, Integer> waren;
+    private Date versanddatum;
 
-    public void lieferschein (int Lieferungsnummer) {
-        this.Lieferungsnummer = Lieferungsnummer;
-
+    public Lieferschein (int lieferscheinnummer, Date versanddatum, Hashtable<Ware, Integer> waren) {
+        this.lieferscheinnummer = lieferscheinnummer;
+        this.waren = waren;
+        this.versanddatum = versanddatum;
     }
 
-    public void setLieferscheinnummer(int lieferscheinnummer){
-        eingabeLieferscheinnummer = lieferscheinnummer;
-    }
-
-    public int getLieferscheinnummer(){
-        return eingabeLieferscheinnummer;
+    public int getLieferscheinnummer() {
+        return this.lieferscheinnummer;
     }
 }

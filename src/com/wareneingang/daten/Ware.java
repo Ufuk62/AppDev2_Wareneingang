@@ -1,26 +1,25 @@
 package com.wareneingang.daten;
 
 public class Ware {
-    int Warennummer;
-    String Warenbezeichnung;
-    double Preis;
+    int warennummer;
+    String warenbezeichnung;
+    double preis;
 
-    //Konstruktor fehlt
-    public Ware (int Warennummer, String Warenbezeichnung, double Preis){
-        this.Warenbezeichnung = Warenbezeichnung;
-        this.Warennummer = Warennummer;
-        this.Preis = Preis;
+    public Ware (int warennummer, String warenbezeichnung, double preis){
+        this.warenbezeichnung = warenbezeichnung;
+        this.warennummer = warennummer;
+        this.preis = preis;
     }
 
     public int getWarennummer() {
-        return Warennummer;
+        return this.warennummer;
     }
 
     public double getPreis() {
-        return Preis;
+        return this.preis;
     }
 
     public String getWarenbezeichnung() {
-        return Warenbezeichnung;
+        return this.warenbezeichnung;
     }
 }

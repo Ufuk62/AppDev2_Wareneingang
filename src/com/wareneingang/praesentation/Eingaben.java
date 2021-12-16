@@ -8,15 +8,39 @@ import java.util.InputMismatchException;
 import java.util.Scanner;
 
 public class Eingaben {
+    Scanner scanner = new Scanner(System.in);
     // Als erstes Eingabe Kundennummer -> Ausgabe Liste der Lieferungen von dem Kunden.
     // Danach Auswahl der Lieferung -> EPK Ablauf fortsetzen
     // (1. Ist Ware in Lieferschein gleich mit Lieferung? -> Qualiaet/Stueckzahl prüfen. Wenn alles Ok. Bezahlen, sonst Teil oder alles Ablehnen)
 
-    public static void wareneingang(Kunde kunde) throws RemoteException, SQLException {
-        Scanner scanner = new Scanner(System.in);
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // liefernummer eingeben
-        //
+    public void wareneingang(Kunde kunde) throws RemoteException, SQLException {
+
+        KundennummerEingebenAlleLieferungenAusgeben();
+        LieferungsnummerEingebenEineLieferungAusgeben();
+        MangelVorhanden();
+        Teilannahme();
+    }
+
+    private void KundennummerEingebenAlleLieferungenAusgeben(){
+        int kundennummer = 0;
+        Lieferung lieferung = null;
+
+        while (lieferung == null) {
+            try {
+                System.out.print("Bitte geben Sie die kundennummer ein: ");
+                kundennummer = scanner.nextInt();
+                lieferung = kunde.getLieferungen(kundennummer);
+
+            } catch (LieferungNotFoundException e) {
+                System.out.printf("Es konnte keine Lieferung mit der Kundennummer" + kundennummer + "gefunden werden.\n");
+            } catch (InputMismatchException e) {
+                System.out.println("Ungültige Eingabe!");
+                scanner.next();
+            }
+        }
+    }
+
+    private void LieferungsnummerEingebenEineLieferungAusgeben () {
         int lieferungsnummer = 0;
         Lieferung lieferung = null;
 
@@ -40,14 +64,12 @@ public class Eingaben {
             System.err.println("Die Lieferung wurde bereits bearbeitet und Angenommen");
             return;
         }
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
         // Lieferung ausgeben
         //
-
         System.out.println(lieferung);
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Mangel vorhanden?
-        //
+    }
+
+    private void MangelVorhanden(){
         System.out.println("Bitte prüfen Sie die Lieferung nach ihrer Qualität und Stückzahl!");
         while(true) {
             try {
@@ -71,9 +93,9 @@ public class Eingaben {
                 scanner.next();
             }
         }
-        //////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
-        // Teilannahme
-        //
+    }
+
+    private void Teilannahme(){
         while(true); {
             try {
                 System.out.println("\nWollen Sie einen Teil der Lieferung annehmen? (ja|nein) ");

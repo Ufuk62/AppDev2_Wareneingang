@@ -31,7 +31,7 @@ public class Eingaben {
                 kundennummer = scanner.nextInt();
                 lieferung = kunde.getLieferungen(kundennummer);
 
-            } catch (LieferungNotFoundException e) {
+            } catch (KundeNotFoundException e) {
                 System.out.printf("Es konnte keine Lieferung mit der Kundennummer" + kundennummer + "gefunden werden.\n");
             } catch (InputMismatchException e) {
                 System.out.println("Ungültige Eingabe!");

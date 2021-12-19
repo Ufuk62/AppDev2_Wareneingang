@@ -67,9 +67,11 @@ public class Lieferung {
 
     public int getStueckzahl() {return 0;}
 
-    public void setQualitaet(String qualitaet) {}
-
-    public String getQualitaet() {return "";}
+    public void setQualitaet(Ware ware, boolean qualitaet) {
+        if (qualitaet) {
+            this.addAngenommeneWare(ware, this.waren.get(ware));
+        }
+    }
 
     public Date getEingangsdatum() {
         return eingangsdatum;

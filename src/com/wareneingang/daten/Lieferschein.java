@@ -2,6 +2,8 @@ package com.wareneingang.daten;
 
 import java.util.Date;
 import java.util.Hashtable;
+import java.util.Iterator;
+import java.util.Set;
 
 public class Lieferschein {
     private int lieferscheinnummer;
@@ -16,5 +18,28 @@ public class Lieferschein {
 
     public int getLieferscheinnummer() {
         return this.lieferscheinnummer;
+    }
+
+    public Ware getWare(int warennummer) {
+        Set<Ware> waren = this.waren.keySet();
+        Iterator<Ware> iterator = waren.iterator();
+
+        while (iterator.hasNext()) {
+            Ware ware = iterator.next();
+
+            if (ware.getWarennummer() == warennummer) {
+                return ware;
+            }
+        }
+
+        return null;
+    }
+
+    public int getStueckzahl(Ware ware) {
+        return waren.get(ware);
+    }
+
+    public Set<Ware> getWaren() {
+        return waren.keySet();
     }
 }

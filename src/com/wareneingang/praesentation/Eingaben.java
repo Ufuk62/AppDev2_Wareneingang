@@ -1,125 +1,245 @@
 package com.wareneingang.praesentation;
 
 import com.wareneingang.daten.*;
-import java.rmi.RemoteException;
+
+import java.io.BufferedReader;
+import java.io.IOException;
+import java.io.InputStreamReader;
 import java.sql.SQLException;
-import java.time.LocalDateTime;
-import java.util.InputMismatchException;
-import java.util.Scanner;
+import java.util.Enumeration;
+import java.util.Iterator;
+import java.util.Set;
+import java.util.Vector;
 
 public class Eingaben {
-    Scanner scanner = new Scanner(System.in);
-    // Als erstes Eingabe Kundennummer -> Ausgabe Liste der Lieferungen von dem Kunden.
-    // Danach Auswahl der Lieferung -> EPK Ablauf fortsetzen
-    // (1. Ist Ware in Lieferschein gleich mit Lieferung? -> Qualiaet/Stueckzahl prüfen. Wenn alles Ok. Bezahlen, sonst Teil oder alles Ablehnen)
 
-    public void wareneingang(Kunde kunde) throws RemoteException, SQLException {
-
-        KundennummerEingebenAlleLieferungenAusgeben();
-        LieferungsnummerEingebenEineLieferungAusgeben();
-        MangelVorhanden();
-        Teilannahme();
+    public Eingaben() throws SQLException, IOException {
+        AusgabeLieferscheinUndLieferungUndAbweichungEingeben();
     }
 
-    private void KundennummerEingebenAlleLieferungenAusgeben(){
-        int kundennummer = 0;
-        Lieferung lieferung = null;
+    private void AusgabeLieferscheinUndLieferungUndAbweichungEingeben() throws IOException, SQLException {
+        try {
+            Datenbank datenbank = new Datenbank();
+            Kunde kunde = datenbank.getKunde(6);
 
-        while (lieferung == null) {
-            try {
-                System.out.print("Bitte geben Sie die kundennummer ein: ");
-                kundennummer = scanner.nextInt();
-                lieferung = kunde.getLieferungen(kundennummer);
+            Enumeration<Lieferung> enumeration = kunde.getLieferungen().elements();
 
-            } catch (KundeNotFoundException e) {
-                System.out.printf("Es konnte keine Lieferung mit der Kundennummer" + kundennummer + "gefunden werden.\n");
-            } catch (InputMismatchException e) {
-                System.out.println("Ungültige Eingabe!");
-                scanner.next();
+            while (enumeration.hasMoreElements()) {
+                Lieferung lieferung = enumeration.nextElement();
+                Lieferschein lieferschein = lieferung.getLieferschein();
+                System.out.println(lieferschein.getLieferscheinnummer());
+
+                Set<Ware> waren = lieferung.getWaren().keySet();
+                Iterator<Ware> iterator = waren.iterator();
+//                System.out.println("\t\t\t\t\t\tLieferung\t\t\t\t\t\t|\t\t\t\t\t\tLieferschein\t\t\t\t\t\t");
+//                System.out.println("--------------------------------------------------------|" +
+//                        "--------------------------------------------------------"
+//                );
+//                System.out.println(" Waren-Nr.\t| Bezeichnung\t\t\t\t| Stueckzahl\t|" +
+//                        " Waren-Nr.\t| Bezeichnung\t\t\t\t| Stueckzahl\t"
+//                );
+//                System.out.println("------------+---------------------------+---------------|" +
+//                        "-----------+---------------------------+----------------"
+//                );
+
+                Set<Ware> lieferscheinWaren = lieferschein.getWaren();
+
+                Vector<Ware> alleWaren = new Vector<>();
+
+                while (iterator.hasNext()) {
+                    Ware ware = iterator.next();
+                    alleWaren.add(ware);
+                    Ware lieferscheinWare = lieferschein.getWare(ware.getWarennummer());
+
+//                    System.out.print(" " + ware.getWarennummer() + "\t\t\t| " + ware.getWarenbezeichnung() +
+//                            " ".repeat(25-ware.getWarenbezeichnung().length()) + "\t| " +
+//                            lieferung.getWaren().get(ware) + " \t\t\t|"
+//                    );
+                    if (lieferscheinWare != null) {
+//                        System.out.println(" " + lieferscheinWare.getWarennummer() +
+//                                " \t\t| " + lieferscheinWare.getWarenbezeichnung() +
+//                                " ".repeat(25-lieferscheinWare.getWarenbezeichnung().length()) + "\t| " +
+//                                lieferschein.getStueckzahl(lieferscheinWare)
+//                        );
+                        lieferscheinWaren.remove(lieferscheinWare);
+                    } else {
+//                        System.out.println("\t".repeat(3) + "\u001B[31m Das Element wurde nicht gefunden \u001B[0m");
+                    }
+                }
+
+                iterator = lieferscheinWaren.iterator();
+                while (iterator.hasNext()) {
+                    Ware ware = iterator.next();
+                    alleWaren.add(ware);
+                    System.out.print("\t".repeat(3) + "\u001B[31m Das Element wurde nicht gefunden \u001B[0m" + "\t".repeat(3) + "|");
+
+
+                    System.out.println(" " + ware.getWarennummer() +
+                            " \t\t| " + ware.getWarenbezeichnung() +
+                            " ".repeat(25-ware.getWarenbezeichnung().length()) + "\t| " +
+                            lieferschein.getStueckzahl(ware)
+                    );
+                    lieferscheinWaren.remove(ware);
+                }
+// ---------------------------------------------------------------------------------------------------------------------
+                while (true) {
+                    System.out.print("Ist eine Abweichung in der Liefermenge vorhanden? (j/N) ");
+                    BufferedReader reader = new BufferedReader(
+                            new InputStreamReader(System.in)
+                    );
+
+                    String input = reader.readLine();
+
+                    if (input.equalsIgnoreCase("j")) {
+                        while (true) {
+                            System.out.print("Geben Sie die Warennummer ein: ");
+
+                            reader = new BufferedReader(
+                                    new InputStreamReader(System.in)
+                            );
+
+                            input = reader.readLine();
+
+                            try {
+                                int warennummer = Integer.parseInt(input);
+
+                                Ware ware = null;
+
+                                for (Ware checkWare : alleWaren) {
+                                    if (warennummer == checkWare.getWarennummer()) {
+                                        ware = checkWare;
+                                    }
+                                }
+
+                                if (ware != null) {
+                                    System.out.println("Ausgewaehlte Ware: \"" + ware.getWarenbezeichnung() + "\"");
+                                    if (StueckzahlPruefung(lieferung, ware, alleWaren)) {
+                                        alleWaren.remove(ware);
+                                    }
+                                    while (true) {
+                                        System.out.print("Sind noch weitere Abweichungen vorhanden? (j/N) ");
+
+                                        reader = new BufferedReader(
+                                                new InputStreamReader(System.in)
+                                        );
+
+                                        input = reader.readLine();
+
+                                        if (input.equalsIgnoreCase("j")) {
+                                            break;
+                                        } else if (input.equalsIgnoreCase("n") || input.length() == 0) {
+                                            QualitaetsCheck(lieferung, alleWaren);
+                                            return;
+                                        } else {
+                                            System.out.println("Eingabe konnte nicht interpretiert werden.");
+                                        }
+                                    }
+                                } else {
+                                    System.out.println("Bitte geben Sie eine vorhandene Warennummer ein.");
+                                }
+                            } catch (NumberFormatException e) {
+                                System.out.println("Das ist keine Warennummer.");
+                            }
+                        }
+                    } else if (input.equalsIgnoreCase("n") || input.length() == 0) {
+                        QualitaetsCheck(lieferung, alleWaren);
+                        return;
+                    } else {
+                        System.out.println("Eingabe konnte nicht interpretiert werden.");
+                    }
+                }
+            }
+
+            datenbank.save(kunde);
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+    }
+
+    static private void QualitaetsCheck(Lieferung lieferung, Vector<Ware> waren) {
+        System.out.println("Bitte ueberpruefen Sie die folgenden Waren auf Ihre Qualitaet.");
+        Iterator<Ware> iterator = waren.iterator();
+        while (iterator.hasNext()) {
+            Ware ware = iterator.next();
+            while (true) {
+                System.out.print(ware.getWarenbezeichnung() + " Qualitaet OK? (J/n) ");
+
+                BufferedReader reader = new BufferedReader(
+                        new InputStreamReader(System.in)
+                );
+
+                try {
+                    String input = reader.readLine();
+
+                    if ((input.equalsIgnoreCase("n"))) {
+                        lieferung.setQualitaet(ware, false);
+                        StueckzahlPruefung(lieferung, ware, waren);
+                        break;
+                    } else if (input.equalsIgnoreCase("j") || input.length() == 0) {
+                        lieferung.setQualitaet(ware, true);
+                        break;
+                    } else {
+                        System.out.println("Die Eingabe konnte nicht interpretiert werden.");
+                    }
+                } catch (IOException e) {
+                    e.printStackTrace();
+                }
             }
         }
+        return;
     }
 
-    private void LieferungsnummerEingebenEineLieferungAusgeben () {
-        int lieferungsnummer = 0;
-        Lieferung lieferung = null;
+    public static boolean StueckzahlPruefung(Lieferung lieferung, Ware ware, Vector<Ware> alleWaren) throws IOException {
+        while (true) {
+            System.out.print("Moechten Sie einen Teil der Ware annehmen? (j/N) ");
 
-        while (lieferung == null) {
-            try {
-                System.out.print("Bitte geben Sie die Lieferungsnummer ein: ");
-                lieferungsnummer = scanner.nextInt();
-                lieferung = kunde.getLieferung(lieferungsnummer);
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(System.in)
+            );
 
-            } catch (LieferungNotFoundException e) {
-                System.out.printf("Es konnte keine Lieferung mit der Nummer" + lieferungsnummer + "gefunden werden.\n");
-            } catch (InputMismatchException e) {
-                System.out.println("Ungültige Eingabe!");
-                scanner.next();
-            }
-        }
+            String input = reader.readLine();
 
-        System.out.println("\n" + String.format("Lieferung " + lieferungsnummer + " des Lieferscheins" + lieferscheinnummer +"(Lieferdatum:" + LocalDateTime. now())); // TODO: Datum lassen?
+            if (input.equalsIgnoreCase("j")) {
+                while (true) {
+                    System.out.print("Bitte geben Sie die Menge ein, die Sie annehmen: ");
 
-        if (lieferung.getAngenommen() != Lieferung.AngenommenEnum.NEIN) {
-            System.err.println("Die Lieferung wurde bereits bearbeitet und Angenommen");
-            return;
-        }
-        // Lieferung ausgeben
-        //
-        System.out.println(lieferung);
-    }
+                    reader = new BufferedReader(
+                            new InputStreamReader(System.in)
+                    );
 
-    private void MangelVorhanden(){
-        System.out.println("Bitte prüfen Sie die Lieferung nach ihrer Qualität und Stückzahl!");
-        while(true) {
-            try {
-                System.out.println("\nIst ein Mangel in der Lieferung vorhanden? (ja|nein) ");
-                String input = scanner.next();
+                    input = reader.readLine();
 
-                if(input.equalsIgnoreCase("ja"))
-                    break;
-                else if(input.equalsIgnoreCase("nein")) {
-
-                    // Lieferung annehmen und Programm beenden
-                    lieferung.setLieferungAngenommen(lieferung.getLiefernummer(), Lieferung.AngenommenEnum.JA);
-                    System.out.println("Der Status der Lieferung wurde auf \"Angenommen\" gesetzt");
-                    return;
-
-                } else
-                    System.out.println("Ungültige Eingabe! Geben Sie \"ja\" oder \"nein\" ein.");
-
-            } catch (InputMismatchException e) {
-                System.out.println("Ungültige Eingabe!");
-                scanner.next();
-            }
-        }
-    }
-
-    private void Teilannahme(){
-        while(true); {
-            try {
-                System.out.println("\nWollen Sie einen Teil der Lieferung annehmen? (ja|nein) ");
-                String input = scanner.next();
-
-                if(input.equalsIgnoreCase("ja")) {
-                    // Lieferung zum Teil annehmen
-                    lieferung.setLieferungAngenommen(lieferung.getLiefernummer(), Lieferung.AngenommenEnum.TEILWEISE);
-                    System.out.println("Der Status der Lieferung wurde auf \"Teilweise angenommen\" gesetzt");
-                    return;
-
-                } else if(input.equalsIgnoreCase("nein")) {
-                    // Lieferung ablehnen
-                    lieferung.setLieferungAngenommen(lieferung.getLiefernummer(), Lieferung.AngenommenEnum.VERWEIGERT);
-                    System.out.println("Der Status der Lieferung wurde auf \"Annahme verweigert\" gesetzt");
-                    return;
-
-                } else
-                    System.out.println("Ungültige Eingabe! Geben Sie \"ja\" oder \"nein\" ein.");
-
-            } catch (InputMismatchException e) {
-                System.out.println("Ungültige Eingabe!");
-                scanner.next();
+                    try {
+                        int anzahl = Integer.parseInt(input);
+                        if (lieferung.getWaren().get(ware) != null) {
+                            int abgelehnt = lieferung.getWaren().get(ware) - anzahl;
+                            if (abgelehnt >= 0) {
+                                lieferung.addAngenommeneWare(ware, anzahl);
+                                if (abgelehnt != 0) {
+                                    lieferung.addAbgelehnteWare(ware, abgelehnt);
+                                }
+                                return false;
+                            } else {
+                                System.out.println("Sie koennen nicht mehr Stuecke annehmen als vorhanden sind");
+                            }
+                        } else {
+                            System.out.println("Diese Ware ist nicht in der Lieferung vorhanden");
+                        }
+                    } catch (NumberFormatException e) {
+                        System.out.println("Die Eingabe konnte nicht interpretiert werden");
+                    }
+                }
+            } else if (input.equalsIgnoreCase("n") || input.length() == 0) {
+                if (lieferung.getWaren().get(ware) != null) {
+                    lieferung.addAbgelehnteWare(ware, lieferung.getWaren().get(ware));
+                }
+                return true;
+            } else {
+                System.out.println("Eingabe konnte nicht interpretiert werden.");
             }
         }
     }
 }
+

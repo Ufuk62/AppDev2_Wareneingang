@@ -1,18 +1,20 @@
 package com.wareneingang;
 
+import com.wareneingang.praesentation.InterfaceIO;
+
 import java.io.IOException;
-import com.wareneingang.praesentation.Eingaben;
+import java.sql.SQLException;
 
 public class Main {
 
     public static void main(String[] args) {
-        /**
-         *
-         * @param lieferung
-         * @param ware
-         * @param alleWaren
-         * @return Ob die uebergebene Ware aus alleWaren geloescht werden soll.
-         * @throws IOException
-         */
+        try {
+            InterfaceIO io = new InterfaceIO();
+        } catch (SQLException e) {
+            e.printStackTrace();
+        } catch (IOException e) {
+            e.printStackTrace();
+        }
+
     }
 }

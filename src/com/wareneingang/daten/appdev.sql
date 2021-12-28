@@ -3,7 +3,7 @@
 -- https://www.phpmyadmin.net/
 --
 -- Host: 127.0.0.1
--- Generation Time: Dec 14, 2021 at 02:47 PM
+-- Generation Time: Dec 28, 2021 at 06:14 PM
 -- Server version: 10.4.21-MariaDB
 -- PHP Version: 8.0.12
 
@@ -326,8 +326,7 @@ INSERT INTO `enthaelt` (`Lieferungsnummer`, `Warennummer`, `Stueckzahl`) VALUES
 (29, 16, 7),
 (29, 18, 2),
 (29, 20, 8),
-(29, 21, 14),
-(29, 23, 16);
+(29, 21, 14);
 
 -- --------------------------------------------------------
 
@@ -594,7 +593,6 @@ INSERT INTO `fuehrt_auf` (`Lieferscheinnummer`, `Warennummer`, `Stueckzahl`) VAL
 (29, 16, 7),
 (29, 18, 8),
 (29, 20, 12),
-(29, 21, 14),
 (29, 23, 16);
 
 -- --------------------------------------------------------
@@ -756,7 +754,7 @@ INSERT INTO `ware` (`Warennummer`, `bezeichnung`, `preis`) VALUES
 (21, 'Portemonnaie', 12.99),
 (22, '1L Sojasauce', 8.49),
 (23, 'RFH Pullover', 200),
-(24, '4x50mm SPAX Universalschraube 100 Stk.', 8.39);
+(24, '4x50mm Schrauben', 8.39);
 
 --
 -- Indexes for dumped tables

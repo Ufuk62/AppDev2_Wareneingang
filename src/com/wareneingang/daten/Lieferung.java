@@ -1,7 +1,6 @@
 package com.wareneingang.daten;
 
-import java.util.Date;
-import java.util.Hashtable;
+import java.util.*;
 
 public class Lieferung {
     private int lieferungsnummer;
@@ -61,12 +60,6 @@ public class Lieferung {
         return abgeschlossen;
     }
 
-    // Um Fehler in Eingaben.java zu entfernen.
-    // Die Methoden gehoeren allerdings eher zu Ware.java.
-    public void setStueckzahl(int stueckzahl) {}
-
-    public int getStueckzahl() {return 0;}
-
     public void setQualitaet(Ware ware, boolean qualitaet) {
         if (qualitaet) {
             this.addAngenommeneWare(ware, this.waren.get(ware));
@@ -83,5 +76,19 @@ public class Lieferung {
 
     public void addAbgelehnteWare(Ware ware, int stueckzahl) {
         abgelehnteWaren.put(ware, stueckzahl);
+    }
+
+    public double getGesamtpreis() {
+        double preis = 0;
+
+        Set<Ware> waren = angenommeneWaren.keySet();
+        Iterator<Ware> iterator = waren.iterator();
+
+        while (iterator.hasNext()) {
+            Ware ware = iterator.next();
+            preis += ware.getPreis() * angenommeneWaren.get(ware);
+        }
+
+        return Math.round(preis * 100.0) / 100.0;
     }
 }

@@ -1,45 +1,18 @@
 package com.wareneingang.daten;
 
-import java.util.Date;
-import java.util.Hashtable;
-import java.util.Iterator;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
+import java.util.ArrayList;
 import java.util.Set;
 
-public class Lieferschein {
-    private int lieferscheinnummer;
-    private Hashtable<Ware, Integer> waren;
-    private Date versanddatum;
+public interface Lieferschein extends Remote {
+    public abstract int getLieferscheinnummer() throws RemoteException;
 
-    public Lieferschein (int lieferscheinnummer, Date versanddatum, Hashtable<Ware, Integer> waren) {
-        this.lieferscheinnummer = lieferscheinnummer;
-        this.waren = waren;
-        this.versanddatum = versanddatum;
-    }
+    public abstract Ware getWare(int warennummer) throws RemoteException;
 
-    public int getLieferscheinnummer() {
-        return this.lieferscheinnummer;
-    }
+    public abstract int getStueckzahl(Ware ware) throws RemoteException;
 
-    public Ware getWare(int warennummer) {
-        Set<Ware> waren = this.waren.keySet();
-        Iterator<Ware> iterator = waren.iterator();
+    public abstract int getStueckzahl(int warennummer) throws RemoteException, Exception;
 
-        while (iterator.hasNext()) {
-            Ware ware = iterator.next();
-
-            if (ware.getWarennummer() == warennummer) {
-                return ware;
-            }
-        }
-
-        return null;
-    }
-
-    public int getStueckzahl(Ware ware) {
-        return waren.get(ware);
-    }
-
-    public Set<Ware> getWaren() {
-        return waren.keySet();
-    }
+    public abstract ArrayList<Ware> getWaren() throws RemoteException;
 }

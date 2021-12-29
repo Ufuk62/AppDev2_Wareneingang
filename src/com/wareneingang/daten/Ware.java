@@ -1,25 +1,12 @@
 package com.wareneingang.daten;
 
-public class Ware {
-    int warennummer;
-    String warenbezeichnung;
-    double preis;
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 
-    public Ware (int warennummer, String warenbezeichnung, double preis){
-        this.warenbezeichnung = warenbezeichnung;
-        this.warennummer = warennummer;
-        this.preis = preis;
-    }
+public interface Ware extends Remote {
+    public abstract int getWarennummer() throws RemoteException;
 
-    public int getWarennummer() {
-        return this.warennummer;
-    }
+    public abstract double getPreis() throws RemoteException;
 
-    public double getPreis() {
-        return this.preis;
-    }
-
-    public String getWarenbezeichnung() {
-        return this.warenbezeichnung;
-    }
+    public abstract String getWarenbezeichnung() throws RemoteException;
 }

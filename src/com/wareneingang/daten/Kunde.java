@@ -1,35 +1,16 @@
 package com.wareneingang.daten;
 
+import java.rmi.Remote;
+import java.rmi.RemoteException;
 import java.util.Hashtable;
 
-public class Kunde {
-    private int kundennummer;
-    private String vorname;
-    private String nachname;
-    // key = lieferungsnummer
-    // value = lieferung
-    private Hashtable<Integer, Lieferung> lieferungen;
+public interface Kunde extends Remote {
 
-    public Kunde(int kundennummer, String vorname, String nachname, Hashtable<Integer, Lieferung> lieferungen) {
-        this.kundennummer = kundennummer;
-        this.lieferungen = lieferungen;
-        this.vorname = vorname;
-        this.nachname = nachname;
-    }
+    public abstract Lieferung getLieferung(int lieferungsnummer) throws RemoteException;
 
-    public Lieferung getLieferung(int lieferungsnummer) {
-        return this.lieferungen.get(lieferungsnummer);
-    }
+    public abstract int getKundennummer() throws RemoteException;
 
-    public int getKundennummer() {
-        return this.kundennummer;
-    }
+    public abstract Hashtable<Integer, Lieferung> getLieferungen() throws RemoteException;
 
-    public Hashtable<Integer, Lieferung> getLieferungen() {
-        return this.lieferungen;
-    }
-
-    public String getName() {
-        return this.nachname + ", " + this.vorname;
-    }
+    public abstract String getName() throws RemoteException;
 }

@@ -5,17 +5,16 @@ import com.wareneingang.daten.*;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.rmi.Naming;
+import java.rmi.NotBoundException;
+import java.rmi.RemoteException;
 import java.sql.SQLException;
-import java.util.Enumeration;
-import java.util.Iterator;
-import java.util.Set;
-import java.util.Vector;
+import java.util.*;
 
 public class InterfaceIO {
-    Datenbank db;
+    private Datenbank db = (Datenbank) Naming.lookup("rmi://localhost:1099/wareneingang_server");
 
-    public InterfaceIO() throws SQLException, IOException {
-        db = new Datenbank();
+    public InterfaceIO() throws SQLException, IOException, NotBoundException {
         ReadKundennummer();
     }
 
@@ -48,6 +47,7 @@ public class InterfaceIO {
     }
 
     private void LieferungAuswahl(Kunde kunde) throws IOException, SQLException {
+        Lieferung l = kunde.getLieferungen().get(1);
         Enumeration<Lieferung> enumeration = kunde.getLieferungen().elements();
 
         System.out.println(" Nr.\t| Eingang am");
@@ -97,7 +97,7 @@ public class InterfaceIO {
                 "-----------+---------------------------+----------------"
         );
 
-        Set<Ware> lieferscheinWaren = lieferschein.getWaren();
+        ArrayList<Ware> lieferscheinWaren = lieferschein.getWaren();
 
         Vector<Ware> alleWaren = new Vector<>();
 
@@ -111,10 +111,16 @@ public class InterfaceIO {
                     lieferung.getWaren().get(ware) + " \t\t\t|"
             );
             if (lieferscheinWare != null) {
+                int stueckzahl = 0;
+                try {
+                    stueckzahl = lieferschein.getStueckzahl(lieferscheinWare.getWarennummer());
+                } catch (Exception e) {
+                    e.printStackTrace();
+                }
                 System.out.println(" " + lieferscheinWare.getWarennummer() +
                         " \t\t| " + lieferscheinWare.getWarenbezeichnung() +
                         " ".repeat(25-lieferscheinWare.getWarenbezeichnung().length()) + "\t| " +
-                        lieferschein.getStueckzahl(lieferscheinWare)
+                        stueckzahl
                 );
                 lieferscheinWaren.remove(lieferscheinWare);
             } else {
@@ -205,7 +211,7 @@ public class InterfaceIO {
         }
     }
 
-    static private void QualitaetsCheck(Lieferung lieferung, Vector<Ware> waren) {
+    static private void QualitaetsCheck(Lieferung lieferung, Vector<Ware> waren) throws RemoteException {
         System.out.println("Bitte ueberpruefen Sie die folgenden Waren auf Ihre Qualitaet.");
         Iterator<Ware> iterator = waren.iterator();
         while (iterator.hasNext()) {
@@ -221,11 +227,11 @@ public class InterfaceIO {
                     String input = reader.readLine();
 
                     if ((input.equalsIgnoreCase("n"))) {
-                        lieferung.setQualitaet(ware, false);
+                        lieferung.setQualitaet(ware.getWarennummer(), false);
                         StueckzahlPruefung(lieferung, ware, waren);
                         break;
                     } else if (input.equalsIgnoreCase("j") || input.length() == 0) {
-                        lieferung.setQualitaet(ware, true);
+                        lieferung.setQualitaet(ware.getWarennummer(), true);
                         break;
                     } else {
                         System.out.println("Die Eingabe konnte nicht interpretiert werden.");

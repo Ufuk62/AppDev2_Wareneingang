@@ -149,7 +149,7 @@ public class InterfaceIO {
             System.out.println(" " + ware.getWarennummer() +
                     " \t\t| " + ware.getWarenbezeichnung() +
                     " ".repeat(25-ware.getWarenbezeichnung().length()) + "\t| " +
-                    lieferschein.getStueckzahl(ware)
+                    lieferschein.getStueckzahl(ware.getWarennummer())
             );
             lieferscheinWaren.remove(ware);
         }

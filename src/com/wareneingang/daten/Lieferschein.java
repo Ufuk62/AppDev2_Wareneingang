@@ -9,7 +9,7 @@ public interface Lieferschein extends Remote {
 
     public abstract Ware getWare(int warennummer) throws RemoteException;
 
-    public abstract int getStueckzahl(int warennummer) throws RemoteException, Exception;
+    public abstract int getStueckzahl(int warennummer) throws RemoteException, NullPointerException;
 
     public abstract ArrayList<Ware> getWaren() throws RemoteException;
 }

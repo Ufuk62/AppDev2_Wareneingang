@@ -31,7 +31,9 @@ public class InterfaceIO {
                 int kNummer = Integer.parseInt(input);
                 Kunde kunde = db.getKunde(kNummer);
                 if (kunde != null) {
+                    System.out.println("Hallo " + kunde.getName());
                     LieferungAuswahl(kunde);
+                    db.save(kunde);
                     return;
                 } else {
                     System.out.println("Diese Kundennummer ist nicht vergeben.");
@@ -49,12 +51,20 @@ public class InterfaceIO {
     private void LieferungAuswahl(Kunde kunde) throws IOException, SQLException {
         Lieferung l = kunde.getLieferungen().get(1);
         Enumeration<Lieferung> enumeration = kunde.getLieferungen().elements();
+        Vector<Integer> abgeschlossene = new Vector<>();
 
         System.out.println(" Nr.\t| Eingang am");
         System.out.println("--------+-----------");
         while (enumeration.hasMoreElements()) {
             Lieferung lieferung = enumeration.nextElement();
-            System.out.println(" " + lieferung.getLieferungsnummer() + "\t\t| " + lieferung.getEingangsdatum().toString());
+            if (!lieferung.isAbgeschlossen()) {
+                System.out.println(" " + lieferung.getLieferungsnummer() +
+                        "\t\t| " + lieferung.getEingangsdatum().toString() +
+                                " (" + lieferung.getWaren().size() + ")"
+                        );
+            } else {
+                abgeschlossene.add(lieferung.getLieferungsnummer());
+            }
         }
 
         while (true) {
@@ -70,8 +80,9 @@ public class InterfaceIO {
                 int lNummer = Integer.parseInt(input);
                 Lieferung lieferung = kunde.getLieferung(lNummer);
 
-                if (lieferung != null) {
+                if (lieferung != null && !abgeschlossene.contains(lieferung.getLieferungsnummer())) {
                     AusgabeLieferscheinUndLieferungUndAbweichungEingeben(lieferung);
+                    return;
                 } else {
                     System.out.println("Bitte wählen Sie eine Nummer aus der Liste.");
                 }
@@ -81,7 +92,7 @@ public class InterfaceIO {
         }
     }
 
-    private void AusgabeLieferscheinUndLieferungUndAbweichungEingeben(Lieferung lieferung) throws IOException, SQLException {
+    private void AusgabeLieferscheinUndLieferungUndAbweichungEingeben(Lieferung lieferung) throws IOException {
         Lieferschein lieferschein = lieferung.getLieferschein();
 
         Set<Ware> waren = lieferung.getWaren().keySet();
@@ -142,7 +153,7 @@ public class InterfaceIO {
             );
             lieferscheinWaren.remove(ware);
         }
-// ---------------------------------------------------------------------------------------------------------------------
+
         while (true) {
             System.out.print("Ist eine Abweichung in der Liefermenge vorhanden? (j/N) ");
             BufferedReader reader = new BufferedReader(
@@ -174,7 +185,7 @@ public class InterfaceIO {
 
                         if (ware != null) {
                             System.out.println("Ausgewaehlte Ware: \"" + ware.getWarenbezeichnung() + "\"");
-                            if (StueckzahlPruefung(lieferung, ware, alleWaren)) {
+                            if (StueckzahlPruefung(lieferung, lieferschein, ware)) {
                                 alleWaren.remove(ware);
                             }
                             while (true) {
@@ -189,7 +200,7 @@ public class InterfaceIO {
                                 if (input.equalsIgnoreCase("j")) {
                                     break;
                                 } else if (input.equalsIgnoreCase("n") || input.length() == 0) {
-                                    QualitaetsCheck(lieferung, alleWaren);
+                                    QualitaetsCheck(lieferung, lieferschein, alleWaren);
                                     return;
                                 } else {
                                     System.out.println("Eingabe konnte nicht interpretiert werden.");
@@ -203,7 +214,7 @@ public class InterfaceIO {
                     }
                 }
             } else if (input.equalsIgnoreCase("n") || input.length() == 0) {
-                QualitaetsCheck(lieferung, alleWaren);
+                QualitaetsCheck(lieferung, lieferschein, alleWaren);
                 return;
             } else {
                 System.out.println("Eingabe konnte nicht interpretiert werden.");
@@ -211,7 +222,7 @@ public class InterfaceIO {
         }
     }
 
-    static private void QualitaetsCheck(Lieferung lieferung, Vector<Ware> waren) throws RemoteException {
+    private void QualitaetsCheck(Lieferung lieferung, Lieferschein lieferschein, Vector<Ware> waren) throws RemoteException {
         System.out.println("Bitte ueberpruefen Sie die folgenden Waren auf Ihre Qualitaet.");
         Iterator<Ware> iterator = waren.iterator();
         while (iterator.hasNext()) {
@@ -228,7 +239,7 @@ public class InterfaceIO {
 
                     if ((input.equalsIgnoreCase("n"))) {
                         lieferung.setQualitaet(ware.getWarennummer(), false);
-                        StueckzahlPruefung(lieferung, ware, waren);
+                        StueckzahlPruefung(lieferung, lieferschein, ware);
                         break;
                     } else if (input.equalsIgnoreCase("j") || input.length() == 0) {
                         lieferung.setQualitaet(ware.getWarennummer(), true);
@@ -241,10 +252,11 @@ public class InterfaceIO {
                 }
             }
         }
+        PreisUndAnnahme(lieferung);
         return;
     }
 
-    public static boolean StueckzahlPruefung(Lieferung lieferung, Ware ware, Vector<Ware> alleWaren) throws IOException {
+    public static boolean StueckzahlPruefung(Lieferung lieferung, Lieferschein lieferschein, Ware ware) throws IOException {
         while (true) {
             System.out.print("Moechten Sie einen Teil der Ware annehmen? (j/N) ");
 
@@ -267,11 +279,11 @@ public class InterfaceIO {
                     try {
                         int anzahl = Integer.parseInt(input);
                         if (lieferung.getWaren().get(ware) != null) {
-                            int abgelehnt = lieferung.getWaren().get(ware) - anzahl;
+                            int abgelehnt = lieferschein.getStueckzahl(ware.getWarennummer()) - anzahl;
                             if (abgelehnt >= 0) {
-                                lieferung.addAngenommeneWare(ware, anzahl);
+                                lieferung.addAngenommeneWare(ware.getWarennummer(), anzahl);
                                 if (abgelehnt != 0) {
-                                    lieferung.addAbgelehnteWare(ware, abgelehnt);
+                                    lieferung.addAbgelehnteWare(ware.getWarennummer(), abgelehnt);
                                 }
                                 return false;
                             } else {
@@ -286,11 +298,38 @@ public class InterfaceIO {
                 }
             } else if (input.equalsIgnoreCase("n") || input.length() == 0) {
                 if (lieferung.getWaren().get(ware) != null) {
-                    lieferung.addAbgelehnteWare(ware, lieferung.getWaren().get(ware));
+                    lieferung.addAbgelehnteWare(ware.getWarennummer(), lieferung.getWaren().get(ware));
                 }
                 return true;
             } else {
                 System.out.println("Eingabe konnte nicht interpretiert werden.");
+            }
+        }
+    }
+
+    public void PreisUndAnnahme(Lieferung lieferung) throws RemoteException {
+        System.out.println("Ihr Gesamtpreis ist: " + lieferung.getGesamtpreis() + " €");
+
+        while (true) {
+            System.out.print("Möchten Sie die Zahlung veranlassen? (j/N) ");
+
+            BufferedReader reader = new BufferedReader(
+                    new InputStreamReader(System.in)
+            );
+
+            try {
+                String input = reader.readLine();
+
+                if ((input.equalsIgnoreCase("j"))) {
+                    lieferung.abschliessen();
+                    return;
+                } else if (input.equalsIgnoreCase("n") || input.length() == 0) {
+                    return;
+                } else {
+                    System.out.println("Die Eingabe konnte nicht interpretiert werden.");
+                }
+            } catch (IOException e) {
+                e.printStackTrace();
             }
         }
     }

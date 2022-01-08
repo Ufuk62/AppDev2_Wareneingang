@@ -14,12 +14,6 @@ public interface Lieferung extends Remote {
 
     public abstract int getLieferungsnummer() throws RemoteException;
 
-    public abstract Hashtable<Ware, Integer> getAbgelehnteWaren() throws RemoteException;
-
-    public abstract Hashtable<Ware, Integer> getAngenommeneWaren() throws RemoteException;
-
-    public abstract boolean isAbgeschlossen() throws RemoteException;
-
     public abstract void setQualitaet(int warennummer, boolean qualitaet) throws RemoteException;
 
     public abstract Date getEingangsdatum() throws RemoteException;

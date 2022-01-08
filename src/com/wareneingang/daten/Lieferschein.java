@@ -6,11 +6,8 @@ import java.util.ArrayList;
 import java.util.Set;
 
 public interface Lieferschein extends Remote {
-    public abstract int getLieferscheinnummer() throws RemoteException;
 
     public abstract Ware getWare(int warennummer) throws RemoteException;
-
-    public abstract int getStueckzahl(Ware ware) throws RemoteException;
 
     public abstract int getStueckzahl(int warennummer) throws RemoteException, Exception;
 
